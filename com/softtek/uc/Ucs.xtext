@@ -1,0 +1,197 @@
+grammar com.softtek.uc.Ucs with org.eclipse.xtext.common.Terminals
+
+generate ucs "http://www.softtek.com/uc/Ucs"
+
+Model:
+	element=AbstractElement
+;
+
+AbstractElement:
+	module=Module | actor=Actores
+;
+
+Module:
+	'module' name=ID '{'
+		'name' ':' (module_name=STRING)
+		(elements+=ModuleElement)*
+	'}'
+;
+
+ModuleElement:
+	Entity | PageContainer | Task
+;
+
+Entity:
+	'entity' name=ID '{'
+		'glossary' ':' '(' 'name' ':' glossary_name=STRING ',' 'description' ':' glossary_description=STRING ')'
+		(fields+=Field)*
+	'}'
+;
+
+Field:
+	BasicField | ReferenceField
+;
+
+BasicField:
+	'field' name=ID ':' 'Text'
+;
+
+ReferenceField:
+	'reference' name=ID ':' entity=[Entity|QualifiedName] '[' lowerBound=INT '..' upperBound=CardinalityUpperBound ']' ('opposite-of' opposite=[ReferenceField|QualifiedName])?
+;
+
+UIContainer:
+	PageContainer
+;
+
+PageContainer:
+	'container' (name=ID) ':' 'Page' '{'
+		'title' ':' (page_title=STRING)
+		(components+=UIComponent)*
+		(commands+=UICommand)*
+	'}'
+;
+
+UIComponent:
+	FormComponent |
+	ListComponent
+;
+
+FormComponent:
+	'component' name=ID ':' 'Form' '{'
+		'title' ':' (form_title=STRING)
+		(commands+=UICommand)*
+	'}'
+;
+
+ListComponent:
+	'component' name=ID ':' 'List' '{'
+		'title' ':' (list_title=STRING)
+		(commands+=UIListCommand)*
+	'}'
+;
+
+UICommand:
+	'command' name=ID ':' (type=UICommandType) '{'
+		'label' ':' (command_label=STRING)
+		('icon' ':' icon=STRING)?
+		'link-to' ":" (link_to=[PageContainer])
+	'}'
+;
+
+UIListCommand:
+	'command' name=ID ':' (type=UICommandType) '{'
+		'label' ':' (command_label=STRING)
+		('icon' ':' icon=STRING)?
+		'link-to' ":" (link_to=[PageContainer])
+	'}'
+;
+
+UICommandAction:
+	UICommandLinkToAction | UICommandFlow
+;
+
+UICommandLinkToAction:
+	'link-to' ":" (link_to=[PageContainer])
+;
+
+UICommandFlow:
+	'flow-to' ':' (flow_to=[UIComponent|QualifiedName])
+;
+
+UICommandType:
+	'Button' | 'DefaultButton' | 'Link'
+;
+
+Actores:
+	(actores+=Actor)*
+;
+
+Actor:
+	'actor' name=ID '{'
+		'name' ':' (actor_name=STRING)
+	'}'
+;
+
+Task:
+	'task' name=ID ':' 'User' '{'
+		'id' ':' uc_id=ID
+		'name' ':' uc_name=STRING
+		'goal' ':' uc_goal=STRING
+		'trigger' ':' trigger=UCTrigger
+		(steps+=TaskStep)*
+	'}'
+;
+
+UCTrigger:
+	actor=[Actor] 'chooses' page=[PageContainer]
+;
+
+TaskStep:
+	SystemStep |
+	ActorStep
+;
+
+SystemStep:
+	SystemShowsStep |
+	SystemValidatesFormStep |
+	SystemFillsListStep |
+	SystemCreatesEntityStep |
+	SystemUpdatesEntityStep |
+	SystemDeletesEntityStep |
+	SystemInvokesUCStep
+;
+
+ActorStep:
+	ActorEntersStep |
+	ActorChoosesStep |
+	ActorSelectsStep
+;
+
+SystemShowsStep:
+	'System' 'shows' page=[PageContainer]
+;
+
+SystemValidatesFormStep:
+	'System' 'validates' form=[FormComponent|QualifiedName]
+;
+
+SystemFillsListStep:
+	'System' 'fills' list=[ListComponent|QualifiedName]
+;
+
+SystemCreatesEntityStep:
+	'System' 'creates' entity=[Entity|QualifiedName]
+;
+
+SystemUpdatesEntityStep:
+	'System' 'updates' entity=[Entity|QualifiedName]
+;
+
+SystemDeletesEntityStep:
+	'System' 'deletes' entity=[Entity|QualifiedName]
+;
+
+SystemInvokesUCStep:
+	'System' 'invokes' usecase=[Task]
+;
+
+ActorEntersStep:
+	actor=[Actor] 'enters' form=[FormComponent|QualifiedName]
+;
+
+ActorChoosesStep:
+	actor=[Actor] 'chooses' command=[UICommand|QualifiedName]
+;
+
+ActorSelectsStep:
+	actor=[Actor] 'selects' list=[UIListCommand|QualifiedName]
+;
+
+QualifiedName:
+  ID ('.' ID)* 
+;
+
+CardinalityUpperBound:
+	INT | '*'
+;
