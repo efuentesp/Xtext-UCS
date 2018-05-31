@@ -8,6 +8,9 @@ import com.softtek.uc.ucs.Task
 import com.softtek.uc.ucs.PageContainer
 import com.softtek.uc.ucs.FormComponent
 import com.softtek.uc.ucs.ListComponent
+import com.softtek.uc.ucs.UIElement
+import com.softtek.uc.ucs.UIField
+import com.softtek.uc.ucs.UIFormContainer
 
 class IUPrototypeGenerator {
 	def doGenerate(Resource resource, IFileSystemAccess2 fsa) {
@@ -107,12 +110,22 @@ class IUPrototypeGenerator {
 	'''
 	
 	def CharSequence genFormComponent(FormComponent f) '''
-	<formbox title="«f.form_title»">
+	<formbox id="«f.name.toLowerCase»" title="«f.form_title»">
+		«FOR field : f.form_elements»
+			«field.genUIElement»
+		«ENDFOR»
 		<div class="ln_solid"></div>
 		«FOR c : f.commands»
 			<submit-button to="/«c.link_to.name»/" action="custom" icon="«c.icon»" caption="«c.command_label»" ></submit-button>
 		«ENDFOR»
 	</formbox>
+	'''
+	
+	def dispatch genUIElement(UIField f) '''
+	<inputbox id="«f.ui_field.name.toLowerCase»" type="text" label="«f.ui_field.name»" value="" placeholder="" required=true />
+	'''
+	
+	def dispatch genUIElement(UIFormContainer e) '''
 	'''
 	
 	def static toLowerCase(String it){

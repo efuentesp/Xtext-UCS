@@ -60,7 +60,8 @@ UIComponent:
 FormComponent:
 	'component' name=ID ':' 'Form' '{'
 		'title' ':' (form_title=STRING)
-		(commands+=UICommand)*
+		(form_elements += UIElement)*
+		(commands += UICommand)*
 	'}'
 ;
 
@@ -69,6 +70,36 @@ ListComponent:
 		'title' ':' (list_title=STRING)
 		(commands+=UIListCommand)*
 	'}'
+;
+
+UIElement:
+	UIFormContainer | UIField
+;
+
+UIFormContainer:
+	UIFormPanel | UIFormRow | UIFormColumn
+;
+
+UIFormPanel:
+	'panel' ':' name=ID '{'
+		(elements += UIElement)*
+	'}'
+;
+
+UIFormRow:
+	'row' '{'
+		(elements += UIElement)*
+	'}'
+;
+
+UIFormColumn:
+	'col' '{'
+		(elements += UIElement)*
+	'}'
+;
+
+UIField:
+	'field' ui_field=[BasicField|QualifiedName]
 ;
 
 UICommand:

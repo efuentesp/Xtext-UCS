@@ -27,7 +27,7 @@ class SpecUseCaseGenerator {
 	}
 	
 	def CharSequence generateModule(Module m) '''
-		\section{Modulo: «m.module_name»}
+		\section{Modulo: «m.module_name»} \label{sec:cu-«m.name.toLowerCase»}
 		
 		«FOR e : m.elements»
 			«e.genModuleElement»
@@ -41,23 +41,25 @@ class SpecUseCaseGenerator {
 	'''
 	
 	def dispatch genModuleElement(Task task) '''
-	\subsection{«task.uc_id». «task.uc_name»} \label{«task.name»}
-	\textbf{Actores}: «task.trigger.actor.name»
+	\subsection{«task.uc_id». «task.uc_name»} \label{sec:cu-«task.name»}
+	\begin{tabular}{ p{3.5cm} p{11.5cm} }
+		\textbf{Actores} & «task.trigger.actor.name»
+		\textbf{Objetivo} & «task.uc_goal».
+		\textbf{Evento Disparador} & «task.trigger.actor.name» solicita la página \textit{[«task.trigger.page.page_title»]}.
+		\textbf{Tipo} & Usuario\\
+		\\
+	\end{tabular}
 	
-	\textbf{Objetivo}: «task.uc_goal».
+	\begin{tabular}{ p{15.5cm} }
+		\textbf{Escenario Principal} \\
+		\begin{enumerate}
+			«FOR s : task.steps»
+				\item «s.genUCStep»
+			«ENDFOR»
+			\item Fin del Caso de Uso.
+		\end{enumerate}
+	\end{tabular}
 	
-	\textbf{Evento Disparador}: «task.trigger.actor.name» solicita la página \textit{[«task.trigger.page.page_title»]}.
-	
-	\textbf{Tipo}: Usuario\\
-	
-	\textbf{Escenario Principal}
-	
-	\begin{enumerate}
-	«FOR s : task.steps»
-		\item «s.genUCStep»
-	«ENDFOR»
-	\item Fin del Caso de Uso.
-	\end{enumerate}
 	'''
 	
 	
