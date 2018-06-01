@@ -98,7 +98,7 @@ class IUPrototypeGenerator {
 				«ENDIF»
 			«ENDFOR»
 			«FOR b : p.commands»
-				<submit-button to="/«b.link_to.name.toLowerCase»/" action="custom" icon="«b.icon»" caption="«b.command_label»" ></submit-button>
+				<submit-button id="btn_«b.name.toLowerCase»" to="/«b.link_to.name.toLowerCase»/" action="custom" icon="«b.icon»" caption="«b.command_label»" ></submit-button>
 			«ENDFOR»
 		</page>
 	</«p.name.toLowerCase»>
